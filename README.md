@@ -2,7 +2,7 @@
 
 Patches the Qobuz Desktop app to restore **Windows System Media Transport Controls (SMTC)** support — the media overlay, taskbar controls, and lock screen playback info that stopped working after version 7.2.0.
 
-![Windows Media Overlay](https://learn.microsoft.com/en-us/windows/uwp/audio-video-camera/images/smtc-toast-background-background.png)
+![Windows Media Overlay](screenshot.png)
 
 ## What it does
 
