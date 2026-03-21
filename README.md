@@ -1,43 +1,32 @@
 # Qobuz SMTC Dirty Fix
 
-Restores **Windows media controls** to the Qobuz Desktop app — the media overlay, taskbar controls, and media key support that stopped working after version 7.2.0.
+Brings back Windows media controls to Qobuz Desktop (broken since v7.2.0).
 
-![Windows Media Overlay](screenshot.png)
+![screenshot](screenshot.png)
 
 ## Install
 
-1. Install [Node.js](https://nodejs.org) (v16+)
+1. Get [Node.js](https://nodejs.org) (v16+)
 2. Close Qobuz
-3. Double-click `install.bat` (or run `node patch.js`)
+3. Double-click `install.bat`
 4. Start Qobuz
 
-To undo: `node patch.js --restore`
+Undo: `node patch.js --restore`
 
-### Custom install path
+Custom path: `node patch.js "C:\path\to\Qobuz"`
 
-If Qobuz isn't at the default location (`%LOCALAPPDATA%\Qobuz`):
+## What you get
 
-```
-node patch.js "C:\path\to\Qobuz"
-```
-
-## Features
-
-- Track title, artist, album, and cover art in the Windows media overlay
-- Play, pause, next, previous, and seek controls
-- Live seek bar position
-- Hardware media key support
+- Track info + cover art in Windows media overlay
+- Play/pause/next/prev/seek from Windows UI
+- Media key support
+- Live seek bar
 
 ## Notes
 
 - Re-run after Qobuz updates
-- The patch is safe to run multiple times
-- Backups are created automatically (`*.backup` files)
+- Safe to run multiple times (auto-restores before re-patching)
 - Tested on Qobuz 8.1.0 / Windows 11
-
-## Why
-
-Qobuz dropped native Windows SMTC support when upgrading Electron. This patch re-implements it using Chromium's `navigator.mediaSession` API with a sub-audible audio bridge.
 
 ## License
 
