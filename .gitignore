@@ -1,0 +1,4 @@
+*.backup
+smtc-tone.wav
+smtc-debug.log
+node_modules/
