@@ -1,4 +1,8 @@
+node_modules/
+build/
 *.backup
 smtc-tone.wav
 smtc-debug.log
-node_modules/
+# .node files ignored except prebuilds
+*.node
+!prebuilds/*.node

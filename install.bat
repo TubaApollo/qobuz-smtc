@@ -1,28 +1,6 @@
 @echo off
 setlocal
 
-:: Qobuz SMTC Patch — Installer
-::
-:: Adds Windows System Media Transport Controls (SMTC) to Qobuz Desktop.
-:: Shows track metadata, artwork, playback controls, and seek position
-:: in the Windows media overlay, taskbar, and lock screen.
-::
-:: Usage:
-::   install.bat                          Install (auto-detect Qobuz path)
-::   install.bat "C:\path\to\Qobuz"      Install with custom path
-::   install.bat --restore                Restore original files
-::
-:: Prerequisites:
-::   - Node.js v16+ in PATH
-::   - Qobuz Desktop installed
-::   - Close Qobuz before running
-::
-:: The following files must be in the same directory as this script:
-::   patch.js           Patcher (applies changes to main-win32.js and app.html)
-::   smtc-main.js       Main process module (replaces empty SMTC stub)
-::   smtc-renderer.js   Renderer module (sets up navigator.mediaSession)
-
-:: Check Node.js
 where node >nul 2>&1
 if %errorlevel% neq 0 (
     echo Error: Node.js is required. Install it from https://nodejs.org
@@ -30,8 +8,7 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: Check required files
-for %%f in (patch.js smtc-main.js smtc-renderer.js) do (
+for %%f in (patch.js smtc-main.js) do (
     if not exist "%~dp0%%f" (
         echo Error: Missing file '%%f' in %~dp0
         pause
@@ -39,7 +16,72 @@ for %%f in (patch.js smtc-main.js smtc-renderer.js) do (
     )
 )
 
-:: Run patcher
-node "%~dp0patch.js" %*
+echo.
+echo  Qobuz SMTC Native Patch
+echo  ========================
+echo.
+echo  NOTE: This tool modifies your local Qobuz installation.
+echo  This may violate the Qobuz Terms of Service.
+echo  Use at your own risk. No warranty.
+echo.
+echo  ---------------------------------------------------------
+echo.
+echo  [1] Use prebuild (fast, no compiler needed)
+echo      Uses the included smtc_native.node
+echo      Built for Electron 32.3.3 / Qobuz 8.1.0
+echo.
+echo  [2] Build from source (recommended, requires VS Build Tools)
+echo      Compiles the .node matching your Qobuz version
+echo.
+echo  [3] Remove patch (restore original files)
+echo.
 
+choice /C 123 /N /M "Choose [1/2/3]: "
+
+if %errorlevel%==3 goto restore
+if %errorlevel%==2 goto build
+if %errorlevel%==1 goto prebuild
+
+:prebuild
+if not exist "%~dp0prebuilds\smtc_native.node" (
+    echo.
+    echo Error: prebuilds\smtc_native.node not found.
+    pause
+    exit /b 1
+)
+echo.
+echo Using prebuild...
+if not exist "%~dp0build\Release" mkdir "%~dp0build\Release"
+copy /Y "%~dp0prebuilds\smtc_native.node" "%~dp0build\Release\smtc_native.node" >nul
+echo.
+node "%~dp0patch.js" %*
 pause
+exit /b 0
+
+:build
+if not exist "%~dp0node_modules" (
+    echo.
+    echo Installing dependencies...
+    cd /d "%~dp0"
+    npm install --ignore-scripts
+)
+echo.
+echo Building native SMTC addon...
+node "%~dp0scripts\build-for-qobuz.js" %*
+if %errorlevel% neq 0 (
+    echo.
+    echo Build failed. Are VS Build Tools installed?
+    echo https://visualstudio.microsoft.com/visual-cpp-build-tools/
+    pause
+    exit /b 1
+)
+echo.
+node "%~dp0patch.js" %*
+pause
+exit /b 0
+
+:restore
+echo.
+node "%~dp0patch.js" --restore
+pause
+exit /b 0

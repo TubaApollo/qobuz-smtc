@@ -1,0 +1,24 @@
+{
+  "name": "qobuz-smtc",
+  "version": "1.0.0",
+  "description": "Native Windows SMTC integration for Qobuz Desktop",
+  "main": "lib/qobuz-paths.js",
+  "scripts": {
+    "install": "node-gyp rebuild",
+    "build": "node-gyp rebuild",
+    "build:electron": "node scripts/build-for-qobuz.js",
+    "patch": "node patch.js"
+  },
+  "dependencies": {
+    "node-addon-api": "^8.0.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "os": [
+    "win32"
+  ]
+}
