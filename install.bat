@@ -55,6 +55,15 @@ if not exist "%~dp0build\Release" mkdir "%~dp0build\Release"
 copy /Y "%~dp0prebuilds\smtc_native.node" "%~dp0build\Release\smtc_native.node" >nul
 echo.
 node "%~dp0patch.js" %*
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Patch failed. Is Qobuz still running?
+    echo Close Qobuz and try again.
+    pause
+    exit /b 1
+)
+echo.
+echo [SUCCESS] Patch applied. Start Qobuz to use SMTC.
 pause
 exit /b 0
 
@@ -70,18 +79,35 @@ echo Building native SMTC addon...
 node "%~dp0scripts\build-for-qobuz.js" %*
 if %errorlevel% neq 0 (
     echo.
-    echo Build failed. Are VS Build Tools installed?
+    echo [ERROR] Build failed. Are VS Build Tools installed?
     echo https://visualstudio.microsoft.com/visual-cpp-build-tools/
     pause
     exit /b 1
 )
 echo.
 node "%~dp0patch.js" %*
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Patch failed. Is Qobuz still running?
+    echo Close Qobuz and try again.
+    pause
+    exit /b 1
+)
+echo.
+echo [SUCCESS] Patch applied. Start Qobuz to use SMTC.
 pause
 exit /b 0
 
 :restore
 echo.
 node "%~dp0patch.js" --restore
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Restore failed.
+    pause
+    exit /b 1
+)
+echo.
+echo [SUCCESS] Original files restored.
 pause
 exit /b 0
