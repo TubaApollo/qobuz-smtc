@@ -18,6 +18,7 @@ var mediaActions = i(40879);
 var smtc = null;
 var trackDuration = 0;
 var lastState = "";
+var lastKnownPos = -1;
 var lastMetaKey = "";
 var syncInterval = null;
 var initAttempts = 0;
@@ -113,19 +114,27 @@ function playing() {
 }
 
 // WinRT SMTC interpolates position internally via playbackRate=1.
-// We only need to send position on state changes, seeks, and track changes.
-// No periodic drift detection needed — just anchor the position and let SMTC track.
+// We re-anchor on state changes and when a seek is detected
+// (actual position differs from expected by more than 2s).
 function sync() {
   if (!smtc) return;
   var isPlaying = playing();
   var state = isPlaying ? 'playing' : 'paused';
+  var stateChanged = state !== lastState;
 
-  if (state !== lastState) {
+  if (stateChanged) {
     lastState = state;
     smtc.setState(state);
-    if (trackDuration > 0) {
-      smtc.setPosition(positionSec(), trackDuration);
+  }
+
+  if (trackDuration > 0) {
+    var pos = positionSec();
+    var expectedPos = isPlaying ? lastKnownPos + 1 : lastKnownPos;
+    var seeked = stateChanged || lastKnownPos < 0 || Math.abs(pos - expectedPos) > 2;
+    if (seeked) {
+      smtc.setPosition(pos, trackDuration);
     }
+    lastKnownPos = pos;
   }
 }
 
@@ -183,6 +192,7 @@ e.exports = class {
     if (disable) {
       trackDuration = 0;
       lastState = '';
+      lastKnownPos = -1;
       lastMetaKey = '';
       smtc.reset(true);
     } else {
