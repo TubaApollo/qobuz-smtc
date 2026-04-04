@@ -15,6 +15,9 @@
       "VCCLCompilerTool": {
         "AdditionalOptions": ["/std:c++17", "/EHsc"],
         "RuntimeLibrary": 2
+      },
+      "VCLinkerTool": {
+        "AdditionalOptions": ["/PDBALTPATH:%_PDB%"]
       }
     },
     "libraries": [
